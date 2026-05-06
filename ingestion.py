@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain_community.document_loaders import TextLoader
@@ -8,20 +9,21 @@ from langchain_text_splitters import CharacterTextSplitter
 
 load_dotenv()
 
+ROOT = Path(__file__).resolve().parents[0]
+
 if __name__ == "__main__":
     print("Ingesting...")
-    loader = TextLoader("/Users/edenmarco/Desktop/langchain-course/mediumblog1.txt")
+    loader = TextLoader(f"{ROOT}/mediumblog1.txt")
     document = loader.load()
 
-    print("splitting...")
+    print("Splitting...")
     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     texts = text_splitter.split_documents(document)
-    print(f"created {len(texts)} chunks")
 
+    print(f"Created {len(texts)} chunks...")
     embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get("OPENAI_API_KEY"))
 
     print("ingesting...")
     PineconeVectorStore.from_documents(
-        texts, embeddings, index_name=os.environ["INDEX_NAME"]
+        texts, embeddings, index_name=os.environ.get("INDEX_NAME")
     )
-    print("finish")
