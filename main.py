@@ -11,7 +11,7 @@ from langchain_pinecone import PineconeVectorStore
 
 load_dotenv()
 
-print("Initializing components...")
+print("Intitializing components...")
 
 embeddings = OpenAIEmbeddings()
 llm = ChatOpenAI()
@@ -22,15 +22,17 @@ vectorstore = PineconeVectorStore(
 
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
-prompt_template = ChatPromptTemplate.from_template(
-    """Answer the question based only on the following context:
+TEMPLATE = """
+Answer the question based only on the following context:
 
 {context}
 
 Question: {question}
 
-Provide a detailed answer:"""
-)
+Provide a detailed answer:
+"""
+
+prompt_template = ChatPromptTemplate.from_template(TEMPLATE)
 
 
 def format_docs(docs):
@@ -38,9 +40,6 @@ def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 
-# ============================================================================
-# IMPLEMENTATION 1: Without LCEL (Simple Function-Based Approach)
-# ============================================================================
 def retrieval_chain_without_lcel(query: str):
     """
     Simple retrieval chain without LCEL.
@@ -69,9 +68,6 @@ def retrieval_chain_without_lcel(query: str):
     return response.content
 
 
-# ============================================================================
-# IMPLEMENTATION 2: With LCEL (LangChain Expression Language) - BETTER APPROACH
-# ============================================================================
 def create_retrieval_chain_with_lcel():
     """
     Create a retrieval chain using LCEL (LangChain Expression Language).
